@@ -1,2 +1,2 @@
-# JavaGuide
-Java学习总结
+# JavaCore
+Java核心知识总结
