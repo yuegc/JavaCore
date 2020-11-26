@@ -6,7 +6,7 @@ java不能直接访问操作系统底层，而是通过本地方法来访问。U
 
 ### 1.1 通过Unsafe类可以分配内存，可以释放内存
 
-类中提供的3个本地方法**allocateMemory()、**reallocateMemory()**、**freeMemory()**分别用于分配内存，扩充内存和释放内存，与C语言中的3个方法对应。
+类中提供的3个本地方法**allocateMemory()**、**reallocateMemory()**、**freeMemory()**分别用于分配内存，扩充内存和释放内存，与C语言中的3个方法对应。
 
 ```java
 //分配内存
