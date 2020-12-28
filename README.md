@@ -1,106 +1,12 @@
-👍推荐 [送你一个 0.73折购买阿里云服务器的机会](https://www.aliyun.com/1111/pintuan-share?ptCode=MTUyNTA5NzQ1MTc4MDE0OHx8MTE0fDE%3D&userCode=hf47liqn)  。1核2G 84元即可薅1年，力度很大，推荐3年（不建议非人新购买，非人新可以注关一下其他云厂商活动或者用朋友/人亲的身份证购买）
+> 阅读笔记
 
-👍推荐 [在线阅读](https://snailclimb.gitee.io/javaguide)  (Github 访问速度比较慢可能会导致部分图片无法刷新出来) 
-
-👍推荐 [图解Java+操作系统+HTTP+计算机网络的 PDF 资料](#优质原创PDF资源)
-
-## 一些闲话：
-
-> 1. **介绍**：关于 JavaGuide 的相关介绍请看：[关于 JavaGuide 的一些说明](https://www.yuque.com/snailclimb/dr6cvl/mr44yt#vu3ok) 。PDF 版本请看：[完结撒花！JavaGuide 面试突击版来啦！](./docs/javaguide面试突击版.md) 。
->2. **PDF版本** ： [《JavaGuide 面试突击版》PDF 版本](#公众号) 。
-> 3. **面试专版** ：准备面试的小伙伴可以考虑面试专版：[《Java 面试进阶指南》](https://xiaozhuanlan.com/javainterview?rel=javaguide) ，欢迎加入[我的星球](https://wx.zsxq.com/dweb2/index/group/48418884588288)获取更多实用干货。
-> 5. **联系我** ：如要进群或者请教问题，请[联系我](#联系我) （备注来自 Github。请直入问题，工作时间不回复）。
-> 6. **转载须知** ：以下所有文章如非文首说明皆为我（Guide哥）的原创，转载在文首注明出处，如发现恶意抄袭/搬运，会动用法律武器维护自己的权益。让我们一起维护一个良好的技术创作环境！⛽️
-
-<p align="center">
-<a href="https://github.com/Snailclimb/JavaGuide" target="_blank">
-	<img src="https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-3/logo - 副本.png" width=""/>
-</a>
-</p>
-<p align="center">
-  <a href="https://snailclimb.gitee.io/javaguide"><img src="https://img.shields.io/badge/阅读-read-brightgreen.svg" alt="阅读"></a>
-  <a href="#公众号"><img src="https://img.shields.io/badge/%E5%85%AC%E4%BC%97%E5%8F%B7-JavaGuide-lightgrey.svg" alt="公众号"></a>
-  <a href="#公众号"><img src="https://img.shields.io/badge/PDF-Java面试突击-important.svg" alt="公众号"></a>
-  <a href="#投稿"><img src="https://img.shields.io/badge/support-投稿-critical.svg" alt="投稿"></a>
-  <img src="https://img.shields.io/github/stars/Snailclimb/JavaGuide" alt="投稿">
-  <a href="https://xiaozhuanlan.com/javainterview?rel=javaguide"><img src="https://img.shields.io/badge/Java-面试指南-important" alt="投稿"></a>
-</p>
-
-
-<h3 align="center">Sponsor</h3>
-
-<table>
-  <tbody>
-    <tr>
-       <td align="center" valign="middle">
-        <a href="https://w.url.cn/s/AS6JeXA">
-          <img src="./media/sponsor/kaikeba.png" style="margin: 0 auto;width:450px" /></a>
-      </td>       
-    </tr>
-  </tbody>
-</table>
+<a href="http://yuegc.gitee.io/javacore"><img src="https://img.shields.io/badge/阅读-read-brightgreen.svg" alt="阅读"></a>
+  <a href="#投稿"><img src="https://img.shields.io/badge/support-发发-critical.svg" alt="投稿"></a>
+  <img src="https://img.shields.io/github/stars/yuegc/JavaCore" alt="投稿">
 
 
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
-- [Java](#java)
-  - [基础](#基础)
-  - [容器](#容器)
-  - [并发](#并发)
-  - [JVM (必看 :+1:)](#jvm-必看-1)
-  - [新特性](#新特性)
-- [网络](#网络)
-- [操作系统](#操作系统)
-- [数据结构与算法](#数据结构与算法)
-  - [数据结构](#数据结构)
-  - [算法](#算法)
-- [数据库](#数据库)
-  - [MySQL](#mysql)
-  - [Redis](#redis)
-- [系统设计](#系统设计)
-  - [编码之道(必看 :+1:)](#编码之道必看-1)
-  - [常用框架](#常用框架)
-    - [Spring/SpringBoot](#springspringboot)
-    - [MyBatis](#mybatis)
-    - [Netty (必看 :+1:)](#netty-必看-1)
-  - [认证授权](#认证授权)
-    - [JWT](#jwt)
-    - [SSO(单点登录)](#sso单点登录)
-  - [分布式](#分布式)
-    - [搜索引擎](#搜索引擎)
-    - [RPC](#rpc)
-    - [API 网关](#api-网关)
-    - [分布式 id](#分布式-id)
-    - [ZooKeeper](#zookeeper)
-  - [微服务](#微服务)
-  - [高并发](#高并发)
-    - [消息队列](#消息队列)
-    - [读写分离](#读写分离)
-    - [分库分表](#分库分表)
-    - [负载均衡](#负载均衡)
-  - [高可用](#高可用)
-    - [CAP 理论](#cap-理论)
-    - [BASE 理论](#base-理论)
-    - [限流](#限流)
-    - [降级](#降级)
-    - [熔断](#熔断)
-    - [排队](#排队)
-  - [大型网站架构](#大型网站架构)
-- [工具](#工具)
-- [面试指南](#面试指南)
-- [Java 学习常见问题汇总](#java-学习常见问题汇总)
-- [书单](#书单)
-- [其他](#其他)
-  - [待办](#待办)
-  - [联系我](#联系我)
-  - [捐赠支持](#捐赠支持)
-  - [Contributor](#贡献者)
-  - [公众号](#公众号)
-
-<!-- /code_chunk_output -->
+[toc]
 
 
 ## Java
