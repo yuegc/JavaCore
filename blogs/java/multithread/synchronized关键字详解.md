@@ -1,6 +1,6 @@
 [toc]
 
-## 1. synchronized作用
+## 一. synchronized作用
 
 **`synchronized` 关键字解决的是多个线程之间访问资源的同步性，`synchronized`关键字可以保证被它修饰的方法或者代码块在任意时刻只能有一个线程执行。**
 
@@ -10,7 +10,7 @@
 >
 > JDK1.6 对锁的实现引入了大量的优化，如偏向锁、轻量级锁、自旋锁、适应性自旋锁、锁消除、锁粗化等技术来减少锁操作的开销。现在JDK源码和很多开源框架里面都大量使用了sychronized。
 
-## 2. 使用方式
+## 二. 使用方式
 
 **synchronized 关键字最主要的三种使用方式：**
 
@@ -42,7 +42,7 @@ synchronized(类.class) {
 }
 ```
 
-## 3. synchronized实现原理
+## 三. synchronized实现原理
 
 上面讲到**`synchronized`**是对 **类对象** 或者 **实例对象** 加锁，那为什么这些对象都可以实现锁呢？
 
@@ -83,7 +83,7 @@ synchronized(类.class) {
 >
 > 首先切换到类的对应目录执行 `javac SyncDemo.java` 命令生成编译后的 .class 文件，然后执行`javap -c -s -v -l SyncDemo.class`。
 
-#### 3.2.1 `synchronized`修饰同步代码块
+#### 3.2.1 synchronized修饰同步代码块
 
 ```java
 public class SyncDemo {
@@ -103,7 +103,7 @@ public class SyncDemo {
 
 在执行 `monitorexit` 指令后，将锁计数器设为 0，表明锁被释放。如果获取对象锁失败，那当前线程就要阻塞等待，直到锁被另外一个线程释放为止。
 
-#### 3.1.2 `synchronized`修饰方法
+#### 3.1.2 synchronized修饰方法
 
 ```java
 public class SyncDemo {
@@ -119,7 +119,7 @@ public class SyncDemo {
 
 **两者的本质都是对 对象监视器 monitor 的获取。**
 
-## 4. 锁优化
+## 四. 锁优化
 
 ### 4.1 锁的分类
 

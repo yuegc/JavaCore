@@ -1,6 +1,6 @@
 [toc]
 
-## 1. Unsafe类作用
+## 一. Unsafe类作用
 
 java不能直接访问操作系统底层，而是通过本地方法来访问。Unsafe类提供了**硬件级别的原子操作**，主要提供了以下功能：
 
@@ -151,7 +151,7 @@ CAS操作是通过**compareAndSwapXXX()**方法实现的。
 public native boolean compareAndSwapInt(Object obj, long offset, int expect, int update);
 ```
 
-## 2. Compare And Swap(CAS)
+## 二. Compare And Swap(CAS)
 
 ### 2.1 CAS介绍
 
@@ -163,7 +163,7 @@ CAS 操作包含三个操作数： **内存位置（V）**、**预期原值（A�
 
 在看一下[volatile](volatile关键字详解), volatile修饰的成员变量在每次被线程访问时，都强迫从共享内存中重读该成员变量的值。而且，当成员变量发生变化时，强迫线程将变化值回写到共享内存。这样在任何时刻，两个不同的线程总是看到某个成员变量的值是相同的，更简单一点理解就是volatile修饰的变量值发生变化时对于另外的线程是可见的。
 
-## 3. Unsafe源码
+## 三. Unsafe源码
 
 ```java
 package sun.misc;

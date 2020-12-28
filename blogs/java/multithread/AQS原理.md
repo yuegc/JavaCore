@@ -1,12 +1,12 @@
 [toc]
 
-## 1. 概述
+## 一. 概述
 
 AQS 的全称为（**`AbstractQueuedSynchronizer`**），这个类在 java.util.concurrent.locks 包下面。
 
 AQS 是一个用来构建锁和同步器的框架，使用 AQS 能简单且高效地构造出应用广泛的大量的同步器，比如 ReentrantLock、Semaphore、ReentrantReadWriteLock、SynchronousQueue、FutureTask 等皆是基于 AQS 的。当然，我们自己也能利用 AQS 非常轻松容易地构造出符合我们自己需求的同步器。
 
-## 2. 原理
+## 二. 原理
 
 AQS 核心思想是：**如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制 AQS 是用 CLH 队列锁实现的，即将暂时获取不到锁的线程加入到队列中**。
 
@@ -15,6 +15,17 @@ AQS 核心思想是：**如果被请求的共享资源空闲，则将当前请�
 AQS原理图：
 
 <img src="../../resource/thread/AQS.png" alt="image-20201125140610385" style="zoom:50%;" />
+
+AQS中几个重要的成员变量：
+
+```java
+// CLH队列的头节点
+private transient volatile Node head;
+// CLH队列的尾节点
+private transient volatile Node tail;
+// 同步状态
+private volatile int state;
+```
 
 ### 2.1 同步状态变量state
 
@@ -71,11 +82,11 @@ protected final boolean compareAndSetState(int expect, int update) {
 
 一般来说，自定义同步器要么是独占方法，要么是共享方式，他们也只需实现tryAcquire-tryRelease、tryAcquireShared-tryReleaseShared中的一种即可。但AQS也支持自定义同步器同时实现独占和共享两种方式，如ReentrantReadWriteLock。
 
-## 3. 源码详解
+## 三. 源码详解
 
 ### 3.1 结点状态waitStatus
 
-先说下Node。Node结点是对每一个等待获取资源的线程的封装，其包含了需要同步的线程本身及其等待状态，如是否被阻塞、是否等待唤醒、是否已经被取消等。变量waitStatus则表示当前Node结点的等待状态，共有5种取值CANCELLED、SIGNAL、CONDITION、PROPAGATE、0。
+先说说Node吧，它是AQS的一个内部类，Node节点是对每一个等待获取资源的线程的封装，其包含了需要同步的线程本身及其等待状态，如是否被阻塞、是否等待唤醒、是否已经被取消等。变量waitStatus则表示当前Node结点的等待状态，共有5种取值CANCELLED、SIGNAL、CONDITION、PROPAGATE、0。
 
 - **CANCELLED(1)：**表示当前节点已取消调度。当timeout或被中断（响应中断的情况下），会触发变更为此状态，进入该状态后的结点将不会再变化。
 - **SIGNAL(-1)：**表示后继节点在等待当前结点唤醒。**后继结点入队时，会将前驱节点的状态更新为SIGNAL。**
@@ -84,6 +95,19 @@ protected final boolean compareAndSetState(int expect, int update) {
 - **0：**新结点入队时的默认状态。
 
 注意，**负值表示结点处于有效等待状态，而正值表示结点已被取消。所以源码中很多地方用>0、<0来判断结点的状态是否正常**。
+
+Node中其他成员变量：
+
+```java
+// 当前节点的前驱节点
+volatile Node prev;
+// 当前节点的后继节点
+volatile Node next;
+// 当前线程
+volatile Thread thread;
+// 下一个等待节点(conditon等待队列的会用到)
+Node nextWaiter;
+```
 
 ### 3.2 acquire(int)
 
@@ -384,7 +408,7 @@ private void doAcquireShared(int arg) {
 }
 ```
 
-这里的流程其实跟acquireQueued()没有太大的差别，只不过这里将补中断的selfInterrupt()放到了doAcquireShared()里面，而独占模式是放到acquireQueued()外面，其实都一样，不知道李二狗大神(Doug Lea)是怎么想的0.0。
+这里的流程其实跟acquireQueued()没有太大的差别，只不过这里将补中断的selfInterrupt()放到了doAcquireShared()里面，而独占模式是放到acquireQueued()外面，其实都一样，不知道李二狗是怎么想的0.0。
 
 **注意：在独占模式下，这里只有head节点的下一个节点才能去尝试获取资源；而共享模式下，head的下一个节点获取资源后，如果资源还有剩余(r > 0)，则会继续去唤醒它的下一个节点，直到剩余资源不足时才继续等待其他线程释放资源。**
 
@@ -449,15 +473,223 @@ private void doReleaseShared() {
 }
 ```
 
-## 4. Condition
+## 四. Condition
 
 ### 4.1 Condition介绍
 
+任何一个java对象都天然继承于Object类，实现线程间通信往往会用到Object的几个方法，比如wait(),wait(long timeout),wait(long timeout, int nanos)与notify(),notifyAll()几个方法实现等待/通知机制；同样， 在java Lock体系下依然会有同样的方法实现等待/通知机制。从整体上来看**Object的wait和notify/notify是与对象监视器配合完成线程间的等待/通知机制，而Condition与Lock配合完成等待通知机制，前者是java底层级别的，后者是语言级别的，具有更高的可控制性和扩展性**。两者除了在使用方式上不同外，在**功能特性**上还是有很多的不同：
+
+- **Condition能够支持不响应中断，而Object方式不支持**
+- **Condition能够支持多条件等待（new 多个Condition对象），而Object方式只能支持一个**
+- **Condition能够支持超时时间的设置，而Object不支持**
+
+Condition接口常用方法：
+
+- **await() ：**造成当前线程在接到信号或被中断之前一直处于等待状态
+- **await(long time, TimeUnit unit) ：**造成当前线程在接到信号、被中断或到达指定等待时间之前一直处于等待状态
+- **awaitNanos(long nanosTimeout) ：**造成当前线程在接到信号、被中断或到达指定等待时间之前一直处于等待状态。返回值表示剩余时间，如果在nanosTimesout之前唤醒，那么返回值 = nanosTimeout - 消耗时间，如果返回值 <= 0 ,则可以认定它已经超时了。
+- **awaitUninterruptibly() ：**造成当前线程在接到信号之前一直处于等待状态。**该方法不响应中断**
+- **awaitUntil(Date deadline) ：**造成当前线程在接到信号、被中断或到达指定最后期限之前一直处于等待状态。如果没有到指定时间就被通知，则返回true，否则表示到了指定时间，返回false
+- **signal() ：**唤醒一个等待线程。该线程从等待方法返回前必须获得与Condition相关的锁
+- **signal()All ：**唤醒所有等待线程。能够从等待方法返回的线程必须获得与Condition相关的锁
+
 ### 4.2 Condition实现原理
+
+我们都知道condition和Lock是要绑定在一起使用的，通过**`lock.newCondition()`**创建一个condition对象，而这个方法实际上是会new出一个**ConditionObject**对象，该类是AQS的一个内部类。
 
 #### 4.2.1 等待队列
 
+AQS在实现锁机制时，内部维护了一个**同步队列(双向虚拟队列)**，而condition也使用了相同的方式在其内部维护了一个**等待队列(单向队列)**，所有调用condition.await方法的线程都会进入等待队列中等待。
+
+ConditionObject中成员变量：
+
+```java
+/** First node of condition queue. */
+private transient Node firstWaiter;
+/** Last node of condition queue. */
+private transient Node lastWaiter;
+```
+
+上面我们提到condition可以实现多条件等待(new 多个Condition对象)，那多条件的时候是不是就有多个等待队列呢？答案是肯定的！
+
+**Object对象监视器上只能拥有一个同步队列(锁池)和一个等待队列(等待池)[锁池、等待池](并发编程基础.md)，而并发包中的Lock拥有一个同步队列和多个等待队列。**
+
+<img src="../../resource/thread/condition queue.png" alt="image-20201127113447940" style="zoom:50%;" />
+
+> 注意：nextWaiter是复用的Node中的成员变量
+
 #### 4.2.2 await()
 
-#### 4.2.3 signal()/signalAll()
+**当调用condition.await()方法后会使得当前获取lock的线程进入到等待队列，如果该线程能够从await()方法返回的，一定是该线程获取了与condition相关联的lock**。代码如下：
+
+```java
+public final void await() throws InterruptedException {
+    if (Thread.interrupted())
+        throw new InterruptedException();
+		// 将当前线程包装成Node，插入到等待队列的最后面
+    Node node = addConditionWaiter();
+		// 释放当前线程所占用的lock，在释放的过程中会唤醒同步队列中的下一个节点
+    int savedState = fullyRelease(node);
+    int interruptMode = 0;
+  	// 判断是否还在同步队列中(释放锁后会从同步队列中移除)
+    while (!isOnSyncQueue(node)) {
+				// 当前线程进入到等待状态
+        LockSupport.park(this);
+        if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
+            break;
+    }
+		// 唤醒后，自旋等待获取到同步状态（即获取到lock）
+    if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
+        interruptMode = REINTERRUPT;
+    if (node.nextWaiter != null) // clean up if cancelled
+        unlinkCancelledWaiters();
+		// 处理被中断的情况
+    if (interruptMode != 0)
+        reportInterruptAfterWait(interruptMode);
+}
+```
+
+##### 4.2.2.1 addConditionWaiter()
+
+该方法将当前线程构建成node放到等待队列的最后面，代码如下：
+
+```java
+private Node addConditionWaiter() {
+    Node t = lastWaiter;
+    // If lastWaiter is cancelled, clean out.
+    if (t != null && t.waitStatus != Node.CONDITION) {
+        unlinkCancelledWaiters();
+        t = lastWaiter;
+    }
+		// 将当前线程包装成Node
+    Node node = new Node(Thread.currentThread(), Node.CONDITION);
+  	// 如果等待队列最后一个节点为空，则整个队列为空，将firstWaiter指向当前node
+    if (t == null)
+        firstWaiter = node;
+    else
+				// 将节点放到队列最后面
+        t.nextWaiter = node;
+		// 更新lastWaiter
+    lastWaiter = node;
+    return node;
+}
+```
+
+##### 4.2.2.2 fullyRelease(Node)
+
+该方法释放资源并唤醒下一个节点
+
+```java
+final int fullyRelease(Node node) {
+    boolean failed = true;
+    try {
+        int savedState = getState();
+      	// 释放资源并唤醒下一个节点
+        if (release(savedState)) {
+						// 成功释放同步状态
+            failed = false;
+            return savedState;
+        } else {
+						// 失败抛出异常
+            throw new IllegalMonitorStateException();
+        }
+    } finally {
+      	// 如果释放失败，则将同步队列里面的节点标记为取消状态
+        if (failed)
+            node.waitStatus = Node.CANCELLED;
+    }
+}
+```
+
+#### 4.2.3 signal()
+
+**调用condition的signal方法可以将等待队列中等待时间最长的节点移动到同步队列中**，使得该节点能够有机会获得lock。因为等待队列是先进先出（FIFO）的，所以等待队列的第一个节点必然会是等待时间最长的节点，也就是每次调用condition的signal方法是将第一个节点移动到同步队列中。代码如下：
+
+```java
+public final void signal() {
+    // 先检测当前线程是否已经获取lock
+    if (!isHeldExclusively())
+        throw new IllegalMonitorStateException();
+    // 获取等待队列中第一个节点，之后的操作都是针对这个节点
+		Node first = firstWaiter;
+    if (first != null)
+        doSignal(first);
+}
+```
+
+##### 4.2.3.1 doSignal(Node)
+
+```java
+private void doSignal(Node first) {
+    do {
+        if ( (firstWaiter = first.nextWaiter) == null)
+            lastWaiter = null;
+				// 将第一个节点从等待队列中移除
+        first.nextWaiter = null;
+		// while中transferForSignal方法对头结点做真正的处理
+    } while (!transferForSignal(first) &&
+             (first = firstWaiter) != null);
+}
+```
+
+##### 4.2.3.2 transferForSignal(Node)
+
+```java
+final boolean transferForSignal(Node node) {
+    /*
+     * If cannot change waitStatus, the node has been cancelled.
+     */
+		// 更新状态为0
+    if (!compareAndSetWaitStatus(node, Node.CONDITION, 0))
+        return false;
+
+    /*
+     * Splice onto queue and try to set waitStatus of predecessor to
+     * indicate that thread is (probably) waiting. If cancelled or
+     * attempt to set waitStatus fails, wake up to resync (in which
+     * case the waitStatus can be transiently and harmlessly wrong).
+     */
+		// 将该节点移入到同步队列中去，返回它的前驱节点
+    Node p = enq(node);
+    int ws = p.waitStatus;
+  	// 如果前驱节点已取消或者更新前驱节点的waitStatus失败，则唤醒当前节点(唤醒后会走acquireQueued方法)
+    if (ws > 0 || !compareAndSetWaitStatus(p, ws, Node.SIGNAL))
+        LockSupport.unpark(node.thread);
+    return true;
+}
+```
+
+#### 4.2.4 signalAll()
+
+singalAll()和singal()的区别在于doSignalAll(方法)，它会唤醒等待队列中的所有节点，代码如下：
+
+```java
+public final void signalAll() {
+    if (!isHeldExclusively())
+        throw new IllegalMonitorStateException();
+    Node first = firstWaiter;
+    if (first != null)
+        doSignalAll(first);
+}
+```
+
+##### 4.2.4.1 doSignalAll(Node)
+
+```java
+private void doSignalAll(Node first) {
+  	// 将第一个节点和最后一个节点置为空(清空等待队列)
+    lastWaiter = firstWaiter = null;
+  	// 循环调用transferForSignal方法
+    do {
+        Node next = first.nextWaiter;
+        first.nextWaiter = null;
+        transferForSignal(first);
+        first = next;
+    } while (first != null);
+}
+```
+
+**await()、signal()/signalAll()整体流程图:**
+
+<img src="../../resource/thread/await、signal.png" alt="image-20201127141236939" style="zoom:80%;" />
 

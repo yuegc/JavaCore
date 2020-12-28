@@ -1,6 +1,6 @@
 [toc]
 
-## 1. Atomic 原子类介绍
+## 一. Atomic 原子类介绍
 
 Atomic 翻译成中文是原子的意思。在化学上，我们知道原子是构成一般物质的最小单位，在化学反应中是不可分割的。在我们这里 Atomic 是指一个操作是不可中断的。即使是在多个线程一起执行的时候，一个操作一旦开始，就不会被其他线程干扰。所谓原子类说简单点就是具有原子/原子操作特征的类。根据操作的数据类型，可以将JUC包中的原子类分为4类
 
@@ -143,7 +143,7 @@ Atomic 翻译成中文是原子的意思。在化学上，我们知道原子是�
   Thread-0 ------ currentValue=1, finalValue=2, compareAndSet Result=true
   ```
 
-## 2. 基本原子类型
+## 二. 基本原子类型
 
 ### 2.1 基本类型原子类介绍
 
@@ -244,7 +244,7 @@ AtomicInteger 类主要利用 CAS (compare and swap) + volatile 和 native 方�
 
 CAS的原理是拿期望的值和原值作比较，如果相同则更新成新的值。[Unsafe 类 ](Unsafe类详解.md)的 objectFieldOffset() 方法是一个本地方法，这个方法是用来拿到“原来的值”的内存地址。另外 value 是一个volatile变量，在内存中可见，因此 JVM 可以保证任何时刻任何线程总能拿到该变量的最新值。
 
-## 3. 数组类型原子类
+## 三. 数组类型原子类
 
 ### 3.1 数组类型原子类介绍
 
@@ -288,7 +288,7 @@ public class AtomicIntegerArrayDemo {
 }
 ```
 
-## 4. 引用类型原子类
+## 四. 引用类型原子类
 
 ### 4.1  引用类型原子类介绍
 
@@ -443,7 +443,7 @@ currentValue=null, currentMark=false
 currentValue=true, currentMark=true, wCasResult=true
 ```
 
-## 5. 对象的属性修改类型原子类
+## 五. 对象的属性修改类型原子类
 
 ### 5.1 对象的属性修改类型原子类介绍
 
