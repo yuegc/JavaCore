@@ -68,7 +68,6 @@ static final class FairSync extends Sync {
         acquire(1);
     }
 
-    
     protected final boolean tryAcquire(int acquires) {
         final Thread current = Thread.currentThread();
         int c = getState();
